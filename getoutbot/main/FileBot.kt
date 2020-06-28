@@ -67,7 +67,7 @@ class FileBot {
                     f += when {
                         it.contains("/*enemyDropEnergy*/") -> it.replace("/*enemyDropEnergy*/", enemyDropEnergy)
                         it.contains("/*doMove*/") -> it.replace("/*doMove*/", doMove)
-                        it.contains("/*onScannedRobot*/") -> it.replace("/*onScannedRobot*/", onScannedRobot)
+                        it.contains("/*onScannedRobot*/") -> it.replace("/*onScannedRob ot*/", onScannedRobot)
                         it.contains("GetOutBot") -> it.replace("GetOutBot", "GetOutBot$_id")
                         else -> it
                     }

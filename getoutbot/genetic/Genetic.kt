@@ -1,5 +1,6 @@
 package getoutbot.genetic
 
+import getoutbot.cultural.BeliefSpace
 import getoutbot.main.BattleRunner
 import kotlin.random.Random
 
@@ -11,18 +12,20 @@ object Genetic {
     const val CROSSOVER_FEE = 0.7
     const val ACTIONS_SIZE = GeneCode.actionsAmount
 
+    var actualGeneration = 0
     private var totalFitness = 0
     val chromosomes: ArrayList<Chromosome> = arrayListOf()
 
     fun start() {
         println("Starting population, writing files")
         for (i in 0 until POPULATION_SIZE) {
-            chromosomes.add(Chromosome().initGenes().makeBot(i.toString()))
+            chromosomes.add(Chromosome(i).initGenes().makeBot(i.toString()))
         }
     }
 
-    fun evolveAndRunSons(battleRunner: BattleRunner) {
-        println("It's the new generation")
+    fun evolveAndRunSons(generation: Int, battleRunner: BattleRunner) {
+        actualGeneration = generation
+        println("It's the new generation: $actualGeneration")
 
         val newPopulation = arrayListOf<Chromosome>()
         val chromosomesToCrossover = arrayListOf<Chromosome>()
@@ -35,6 +38,7 @@ object Genetic {
                 if (it.canBeRelative(totalFitness))
                     chromosomesToCrossover.add(it)
 
+                BeliefSpace.acceptSituational(it)
                 newPopulation.add(it)
             }
 
@@ -44,13 +48,14 @@ object Genetic {
 
                     // testing one son, after i will test with two sons
                     val son: Chromosome = makeSonWith(chromosomeToCrossover, anotherChromosome)
+                    BeliefSpace.influence(son)
                     son.apply {
                         val id = "9999"
                         battleRunner.runBattle(makeBot(id), id)
                     }
 
                     for (i in POPULATION_SIZE - 1 downTo 0) {
-                        if (newPopulation[i].fitness > son.fitness) {
+                        if (son.isBetterThan(newPopulation[i])) {
                             newPopulation[i] = (son)
                             break
                         }
@@ -58,7 +63,10 @@ object Genetic {
                 }
             }
 
-            newPopulation.forEach { println("Fitness ${it.id} ${it.fitness}") }
+            newPopulation.forEach {
+                BeliefSpace.acceptSituational(it)
+                it.log()
+            }
             chromosomes.clear()
             chromosomes.addAll(newPopulation)
         }
@@ -74,7 +82,7 @@ object Genetic {
 
     private fun makeSon(genesP: ArrayList<Pair<GeneCode, String>>, genesM: ArrayList<Pair<GeneCode, String>>): Chromosome {
         val cutPoint = Random.nextInt(1, ACTIONS_SIZE)
-        return Chromosome().also {
+        return Chromosome(actualGeneration).also {
             val influent = if (Random.nextDouble() > .5) genesM else genesP
 
             for (i in 0 until cutPoint) {

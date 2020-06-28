@@ -1,9 +1,10 @@
 package getoutbot.genetic
 
+import getoutbot.cultural.BeliefSpace
 import getoutbot.main.FileBot
 import kotlin.random.Random
 
-class Chromosome {
+class Chromosome(var generation: Int) {
 
     var id = ""
     var genes: ArrayList<Pair<GeneCode, String>> = arrayListOf()
@@ -96,5 +97,13 @@ class Chromosome {
             }
             res + it
         }
+    }
+
+    fun isBetterThan(chromosome: Chromosome): Boolean {
+        return fitness < chromosome.fitness
+    }
+
+    fun log() {
+        println("Chromosome $id Generation $generation Fitness $fitness")
     }
 }

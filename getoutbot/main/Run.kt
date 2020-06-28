@@ -1,5 +1,6 @@
 package getoutbot.main
 
+import getoutbot.cultural.BeliefSpace
 import getoutbot.genetic.Genetic
 
 class Run {
@@ -20,9 +21,11 @@ class Run {
 
         for (i in 0 until Genetic.GENERATIONS) {
             runPopulation()
-            Genetic.evolveAndRunSons(myBattleRunner)
+            Genetic.evolveAndRunSons(i, myBattleRunner)
+            BeliefSpace.best()?.log()
         }
 
+        println("finishing")
         myBattleRunner.battleShutdown()
     }
 

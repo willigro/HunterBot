@@ -32,6 +32,7 @@ public class GetOutBot extends AdvancedRobot {
         setBulletColor(Color.black);
 
         fullEnergy = getEnergy();
+
         //noinspection InfiniteLoopStatement
         while (true) {
             doMove();
